@@ -1,3 +1,4 @@
+
 name: Build Native Libraries
 
 on:
@@ -14,13 +15,14 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
 
       - name: Build frost-ffi for macOS
-        run: cargo build --release -p frost-ffi
+        working-directory: frost-ffi
+        run: cargo build --release
 
       - name: Upload macOS dylib
         uses: actions/upload-artifact@v4
         with:
           name: libfrost_ffi-macos
-          path: target/release/libfrost_ffi.dylib
+          path: frost-ffi/target/release/libfrost_ffi.dylib
 
   build-linux:
     name: Build Linux .so
@@ -32,10 +34,11 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
 
       - name: Build frost-ffi for Linux
-        run: cargo build --release -p frost-ffi
+        working-directory: frost-ffi
+        run: cargo build --release
 
       - name: Upload Linux .so
         uses: actions/upload-artifact@v4
         with:
           name: libfrost_ffi-linux
-          path: target/release/libfrost_ffi.so
+          path: frost-ffi/target/release/libfrost_ffi.so
