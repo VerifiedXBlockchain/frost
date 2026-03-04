@@ -1,0 +1,43 @@
+name: Build Native Libraries
+
+on:
+  workflow_dispatch:  # Manual trigger only
+
+jobs:
+  build-macos:
+    name: Build macOS dylib
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Build frost-ffi for macOS
+        working-directory: frost-ffi
+        run: cargo build --release
+
+      - name: Upload macOS dylib
+        uses: actions/upload-artifact@v4
+        with:
+          name: libfrost_ffi-macos
+          path: frost-ffi/target/release/libfrost_ffi.dylib
+
+  build-linux:
+    name: Build Linux .so
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Build frost-ffi for Linux
+        working-directory: frost-ffi
+        run: cargo build --release
+
+      - name: Upload Linux .so
+        uses: actions/upload-artifact@v4
+        with:
+          name: libfrost_ffi-linux
+          path: frost-ffi/target/release/libfrost_ffi.so

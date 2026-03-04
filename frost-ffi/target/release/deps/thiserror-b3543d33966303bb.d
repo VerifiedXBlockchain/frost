@@ -1,0 +1,14 @@
+C:\Users\Aaron\Documents\GitHub\frost\frost-ffi\target\release\deps\thiserror-b3543d33966303bb.d: C:\Users\Aaron\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\thiserror-2.0.17\src\lib.rs C:\Users\Aaron\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\thiserror-2.0.17\src\aserror.rs C:\Users\Aaron\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\thiserror-2.0.17\src\display.rs C:\Users\Aaron\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\thiserror-2.0.17\src\var.rs C:\Users\Aaron\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\thiserror-2.0.17\src\private.rs C:\Users\Aaron\Documents\GitHub\frost\frost-ffi\target\release\build\thiserror-7de462098fd46b9e\out/private.rs
+
+C:\Users\Aaron\Documents\GitHub\frost\frost-ffi\target\release\deps\libthiserror-b3543d33966303bb.rlib: C:\Users\Aaron\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\thiserror-2.0.17\src\lib.rs C:\Users\Aaron\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\thiserror-2.0.17\src\aserror.rs C:\Users\Aaron\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\thiserror-2.0.17\src\display.rs C:\Users\Aaron\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\thiserror-2.0.17\src\var.rs C:\Users\Aaron\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\thiserror-2.0.17\src\private.rs C:\Users\Aaron\Documents\GitHub\frost\frost-ffi\target\release\build\thiserror-7de462098fd46b9e\out/private.rs
+
+C:\Users\Aaron\Documents\GitHub\frost\frost-ffi\target\release\deps\libthiserror-b3543d33966303bb.rmeta: C:\Users\Aaron\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\thiserror-2.0.17\src\lib.rs C:\Users\Aaron\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\thiserror-2.0.17\src\aserror.rs C:\Users\Aaron\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\thiserror-2.0.17\src\display.rs C:\Users\Aaron\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\thiserror-2.0.17\src\var.rs C:\Users\Aaron\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\thiserror-2.0.17\src\private.rs C:\Users\Aaron\Documents\GitHub\frost\frost-ffi\target\release\build\thiserror-7de462098fd46b9e\out/private.rs
+
+C:\Users\Aaron\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\thiserror-2.0.17\src\lib.rs:
+C:\Users\Aaron\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\thiserror-2.0.17\src\aserror.rs:
+C:\Users\Aaron\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\thiserror-2.0.17\src\display.rs:
+C:\Users\Aaron\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\thiserror-2.0.17\src\var.rs:
+C:\Users\Aaron\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\thiserror-2.0.17\src\private.rs:
+C:\Users\Aaron\Documents\GitHub\frost\frost-ffi\target\release\build\thiserror-7de462098fd46b9e\out/private.rs:
+
+# env-dep:OUT_DIR=C:\\Users\\Aaron\\Documents\\GitHub\\frost\\frost-ffi\\target\\release\\build\\thiserror-7de462098fd46b9e\\out

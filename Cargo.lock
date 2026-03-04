@@ -597,6 +597,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "frost-ffi"
+version = "0.1.0"
+dependencies = [
+ "frost-core",
+ "frost-secp256k1-tr",
+ "hex",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "frost-p256"
 version = "2.2.0"
 dependencies = [

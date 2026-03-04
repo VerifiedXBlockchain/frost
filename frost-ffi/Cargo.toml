@@ -1,0 +1,26 @@
+[package]
+name = "frost-ffi"
+version = "0.1.0"
+edition = "2021"
+authors = ["VerifiedX Team"]
+description = "FFI bindings for FROST threshold signatures (secp256k1 Taproot)"
+
+[workspace]
+# Empty workspace table to make this crate standalone (not part of parent workspace)
+
+[lib]
+crate-type = ["cdylib"]  # Creates a dynamic library (DLL on Windows)
+name = "frost_ffi"
+
+[dependencies]
+frost-secp256k1-tr = { path = "../frost-secp256k1-tr" }
+frost-core = { path = "../frost-core" }
+hex = "0.4"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+rand = "0.8"
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1

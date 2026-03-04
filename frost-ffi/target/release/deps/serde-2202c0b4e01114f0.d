@@ -1,0 +1,14 @@
+C:\Users\Aaron\Documents\GitHub\frost\frost-ffi\target\release\deps\serde-2202c0b4e01114f0.d: C:\Users\Aaron\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.228\src\lib.rs C:\Users\Aaron\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.228\src\integer128.rs C:\Users\Aaron\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.228\src\private\mod.rs C:\Users\Aaron\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.228\src\private\de.rs C:\Users\Aaron\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.228\src\private\ser.rs C:\Users\Aaron\Documents\GitHub\frost\frost-ffi\target\release\build\serde-54ac7ac43f581648\out/private.rs
+
+C:\Users\Aaron\Documents\GitHub\frost\frost-ffi\target\release\deps\libserde-2202c0b4e01114f0.rlib: C:\Users\Aaron\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.228\src\lib.rs C:\Users\Aaron\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.228\src\integer128.rs C:\Users\Aaron\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.228\src\private\mod.rs C:\Users\Aaron\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.228\src\private\de.rs C:\Users\Aaron\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.228\src\private\ser.rs C:\Users\Aaron\Documents\GitHub\frost\frost-ffi\target\release\build\serde-54ac7ac43f581648\out/private.rs
+
+C:\Users\Aaron\Documents\GitHub\frost\frost-ffi\target\release\deps\libserde-2202c0b4e01114f0.rmeta: C:\Users\Aaron\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.228\src\lib.rs C:\Users\Aaron\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.228\src\integer128.rs C:\Users\Aaron\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.228\src\private\mod.rs C:\Users\Aaron\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.228\src\private\de.rs C:\Users\Aaron\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.228\src\private\ser.rs C:\Users\Aaron\Documents\GitHub\frost\frost-ffi\target\release\build\serde-54ac7ac43f581648\out/private.rs
+
+C:\Users\Aaron\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.228\src\lib.rs:
+C:\Users\Aaron\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.228\src\integer128.rs:
+C:\Users\Aaron\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.228\src\private\mod.rs:
+C:\Users\Aaron\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.228\src\private\de.rs:
+C:\Users\Aaron\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.228\src\private\ser.rs:
+C:\Users\Aaron\Documents\GitHub\frost\frost-ffi\target\release\build\serde-54ac7ac43f581648\out/private.rs:
+
+# env-dep:OUT_DIR=C:\\Users\\Aaron\\Documents\\GitHub\\frost\\frost-ffi\\target\\release\\build\\serde-54ac7ac43f581648\\out
