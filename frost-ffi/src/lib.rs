@@ -443,8 +443,12 @@ pub extern "C" fn frost_sign_round2_signature(
     // Create signing package (returns struct directly, not Result)
     let signing_package = frost::SigningPackage::new(commitments, &message_bytes);
 
-    // Generate signature share
-    let signature_share = match frost::round2::sign(&signing_package, &nonces, &key_package) {
+    // Generate signature share WITH TAPROOT TWEAK.
+    // The key_package already has one BIP-341 tweak from post_dkg.
+    // NBitcoin's TaprootPubKey.GetAddress() applies a SECOND tweak when deriving
+    // the deposit address. We must apply this same second tweak during signing
+    // so the signature is valid against the double-tweaked key in the address.
+    let signature_share = match frost::round2::sign_with_tweak(&signing_package, &nonces, &key_package, None) {
         Ok(share) => share,
         Err(_) => return ERROR_CRYPTO_ERROR,
     };
@@ -556,8 +560,10 @@ pub extern "C" fn frost_sign_aggregate(
     // Create signing package (returns struct directly, not Result)
     let signing_package = frost::SigningPackage::new(commitments, &message_bytes);
 
-    // Aggregate signature
-    let group_signature = match frost::aggregate(&signing_package, &signature_shares, &pubkey_package) {
+    // Aggregate signature WITH TAPROOT TWEAK.
+    // Must match the second tweak applied during sign_with_tweak above,
+    // so the aggregated signature is valid against the double-tweaked output key.
+    let group_signature = match frost::aggregate_with_tweak(&signing_package, &signature_shares, &pubkey_package, None) {
         Ok(sig) => sig,
         Err(_) => return ERROR_CRYPTO_ERROR,
     };
