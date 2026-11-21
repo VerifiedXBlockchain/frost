@@ -16,6 +16,8 @@ const ERROR_INVALID_UTF8: ErrorCode = -2;
 const ERROR_SERIALIZATION: ErrorCode = -3;
 const ERROR_CRYPTO_ERROR: ErrorCode = -4;
 const ERROR_INVALID_PARAMETER: ErrorCode = -5;
+/// `frost_sign_aggregate_identify`: one or more signature shares do not verify; their holders are named.
+const ERROR_INVALID_SIGNATURE_SHARE: ErrorCode = -6;
 
 /// Frees a string allocated by Rust and passed to C#
 #[no_mangle]
@@ -587,6 +589,104 @@ pub extern "C" fn frost_sign_aggregate(
     }
 }
 
+/// Like `frost_sign_aggregate`, but when shares do not verify it names their holders instead of returning a bare
+/// error: every share is checked against its holder's verifying share (`CheaterDetection::AllCheaters`), the call
+/// returns `ERROR_INVALID_SIGNATURE_SHARE`, and `out_culprits` receives a JSON array of the holders' identifiers (in
+/// the same encoding as the keys of `signature_shares_json`). On success `out_culprits` is left null. A coordinator
+/// can then leave those holders out of its next session (RFC 9591, sections 5.4 and 7).
+#[no_mangle]
+pub extern "C" fn frost_sign_aggregate_identify(
+    signature_shares_json: *const c_char,
+    nonce_commitments_json: *const c_char,
+    message_hash_hex: *const c_char,
+    pubkey_package_json: *const c_char,
+    out_schnorr_signature: *mut *mut c_char,
+    out_culprits: *mut *mut c_char,
+) -> ErrorCode {
+    if signature_shares_json.is_null()
+        || nonce_commitments_json.is_null()
+        || message_hash_hex.is_null()
+        || pubkey_package_json.is_null()
+        || out_schnorr_signature.is_null()
+        || out_culprits.is_null()
+    {
+        return ERROR_NULL_POINTER;
+    }
+    unsafe {
+        *out_culprits = ptr::null_mut();
+    }
+
+    let read = |p: *const c_char| unsafe { CStr::from_ptr(p).to_str().map(|s| s.to_owned()) };
+    let (shares_str, commitments_str, message_str, pubkey_str) = match (
+        read(signature_shares_json),
+        read(nonce_commitments_json),
+        read(message_hash_hex),
+        read(pubkey_package_json),
+    ) {
+        (Ok(a), Ok(b), Ok(c), Ok(d)) => (a, b, c, d),
+        _ => return ERROR_INVALID_UTF8,
+    };
+
+    let signature_shares: BTreeMap<frost::Identifier, frost::round2::SignatureShare> =
+        match serde_json::from_str(&shares_str) {
+            Ok(shares) => shares,
+            Err(_) => return ERROR_SERIALIZATION,
+        };
+    let commitments: BTreeMap<frost::Identifier, frost::round1::SigningCommitments> =
+        match serde_json::from_str(&commitments_str) {
+            Ok(c) => c,
+            Err(_) => return ERROR_SERIALIZATION,
+        };
+    let pubkey_package: frost::keys::PublicKeyPackage = match serde_json::from_str(&pubkey_str) {
+        Ok(pkg) => pkg,
+        Err(_) => return ERROR_SERIALIZATION,
+    };
+    let message_bytes = match hex::decode(&message_str) {
+        Ok(bytes) if bytes.len() == 32 => bytes,
+        _ => return ERROR_INVALID_PARAMETER,
+    };
+
+    let signing_package = frost::SigningPackage::new(commitments, &message_bytes);
+    let group_signature = match frost_core::aggregate_custom(
+        &signing_package,
+        &signature_shares,
+        &pubkey_package,
+        frost_core::CheaterDetection::AllCheaters,
+    ) {
+        Ok(sig) => sig,
+        Err(frost_core::Error::InvalidSignatureShare { culprits }) => {
+            let json = match serde_json::to_string(&culprits) {
+                Ok(j) => j,
+                Err(_) => return ERROR_SERIALIZATION,
+            };
+            return match CString::new(json) {
+                Ok(c) => {
+                    unsafe {
+                        *out_culprits = c.into_raw();
+                    }
+                    ERROR_INVALID_SIGNATURE_SHARE
+                }
+                Err(_) => ERROR_SERIALIZATION,
+            };
+        }
+        Err(_) => return ERROR_CRYPTO_ERROR,
+    };
+
+    let sig_bytes = match group_signature.serialize() {
+        Ok(bytes) => bytes,
+        Err(_) => return ERROR_SERIALIZATION,
+    };
+    match CString::new(hex::encode(sig_bytes)) {
+        Ok(c_sig) => {
+            unsafe {
+                *out_schnorr_signature = c_sig.into_raw();
+            }
+            SUCCESS
+        }
+        Err(_) => ERROR_SERIALIZATION,
+    }
+}
+
 /// Get library version
 #[no_mangle]
 pub extern "C" fn frost_get_version(out_version: *mut *mut c_char) -> ErrorCode {
@@ -594,7 +694,7 @@ pub extern "C" fn frost_get_version(out_version: *mut *mut c_char) -> ErrorCode 
         return ERROR_NULL_POINTER;
     }
 
-    let version = "0.2.0-frost-real";
+    let version = "0.3.0-frost-real";
     match CString::new(version) {
         Ok(c_version) => {
             unsafe {
@@ -648,5 +748,84 @@ mod tests {
             frost_free_string(commitment_ptr);
             frost_free_string(secret_ptr);
         }
+    }
+
+    /// Signs with a 2-of-3 dealer key. `swap` replaces the share of the given signers with another signer's share:
+    /// well-formed, but not theirs.
+    fn aggregate_with(swap: &[usize]) -> (ErrorCode, Option<String>, Option<String>, Vec<frost::Identifier>) {
+        let mut rng = OsRng;
+        let (shares, pubkeys) =
+            frost::keys::generate_with_dealer(3, 2, frost::keys::IdentifierList::Default, &mut rng).unwrap();
+        let keys: Vec<(frost::Identifier, frost::keys::KeyPackage)> = shares
+            .into_iter()
+            .map(|(id, s)| (id, frost::keys::KeyPackage::try_from(s).unwrap()))
+            .collect();
+        let message = [7u8; 32];
+        let mut nonces = BTreeMap::new();
+        let mut commitments = BTreeMap::new();
+        for (id, key) in &keys {
+            let (n, c) = frost::round1::commit(key.signing_share(), &mut rng);
+            nonces.insert(*id, n);
+            commitments.insert(*id, c);
+        }
+        let package = frost::SigningPackage::new(commitments.clone(), &message);
+        let mut sig_shares = BTreeMap::new();
+        for (id, key) in &keys {
+            sig_shares.insert(*id, frost::round2::sign(&package, &nonces[id], key).unwrap());
+        }
+        let ids: Vec<frost::Identifier> = keys.iter().map(|(id, _)| *id).collect();
+        for &i in swap {
+            let other = sig_shares[&ids[(i + 1) % ids.len()]];
+            sig_shares.insert(ids[i], other);
+        }
+        let c = |v: String| CString::new(v).unwrap();
+        let shares_json = c(serde_json::to_string(&sig_shares).unwrap());
+        let commitments_json = c(serde_json::to_string(&commitments).unwrap());
+        let message_hex = c(hex::encode(message));
+        let pubkey_json = c(serde_json::to_string(&pubkeys).unwrap());
+        let mut sig_ptr: *mut c_char = ptr::null_mut();
+        let mut culprits_ptr: *mut c_char = ptr::null_mut();
+        let code = frost_sign_aggregate_identify(
+            shares_json.as_ptr(),
+            commitments_json.as_ptr(),
+            message_hex.as_ptr(),
+            pubkey_json.as_ptr(),
+            &mut sig_ptr,
+            &mut culprits_ptr,
+        );
+        let take = |p: *mut c_char| {
+            (!p.is_null()).then(|| {
+                let s = unsafe { CStr::from_ptr(p).to_str().unwrap().to_owned() };
+                frost_free_string(p);
+                s
+            })
+        };
+        (code, take(sig_ptr), take(culprits_ptr), ids)
+    }
+
+    #[test]
+    fn honest_shares_aggregate_and_name_nobody() {
+        let (code, sig, culprits, _) = aggregate_with(&[]);
+        assert_eq!(code, SUCCESS);
+        assert_eq!(sig.unwrap().len(), 128);
+        assert!(culprits.is_none());
+    }
+
+    #[test]
+    fn a_wrong_share_is_refused_and_its_holder_named() {
+        let (code, sig, culprits, ids) = aggregate_with(&[1]);
+        assert_eq!(code, ERROR_INVALID_SIGNATURE_SHARE);
+        assert!(sig.is_none());
+        let named: Vec<frost::Identifier> = serde_json::from_str(&culprits.unwrap()).unwrap();
+        assert_eq!(named, vec![ids[1]]);
+    }
+
+    #[test]
+    fn every_wrong_share_is_named() {
+        let (code, _, culprits, ids) = aggregate_with(&[0, 2]);
+        assert_eq!(code, ERROR_INVALID_SIGNATURE_SHARE);
+        let mut named: Vec<frost::Identifier> = serde_json::from_str(&culprits.unwrap()).unwrap();
+        named.sort();
+        assert_eq!(named, vec![ids[0], ids[2]]);
     }
 }
